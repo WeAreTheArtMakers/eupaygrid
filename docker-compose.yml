@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: eupaygrid
+      POSTGRES_PASSWORD: eupaygrid
+      POSTGRES_DB: eupaygrid
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./backend/app/db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U eupaygrid -d eupaygrid']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      APP_NAME: ${APP_NAME:-eupaygrid-backend}
+      ENVIRONMENT: ${ENVIRONMENT:-dev}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      POSTGRES_DSN: ${POSTGRES_DSN:-postgresql://eupaygrid:eupaygrid@postgres:5432/eupaygrid}
+      POSTGRES_MIN_POOL: ${POSTGRES_MIN_POOL:-1}
+      POSTGRES_MAX_POOL: ${POSTGRES_MAX_POOL:-10}
+      ALLOWED_CURRENCIES: ${ALLOWED_CURRENCIES:-EUR}
+      SETTLEMENT_LAYER: ${SETTLEMENT_LAYER:-simulated-solana}
+      OTEL_ENABLED: ${OTEL_ENABLED:-false}
+      OTEL_EXPORTER_ENDPOINT: ${OTEL_EXPORTER_ENDPOINT:-http://otel-collector:4317}
+    ports:
+      - '8000:8000'
+    command: ['uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port', '8000']
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      backend:
+        condition: service_started
+    environment:
+      NEXT_PUBLIC_API_BASE: ${NEXT_PUBLIC_API_BASE:-http://localhost:8000}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:8000/ws/events}
+      NEXT_PUBLIC_DEFAULT_ACTOR: ${NEXT_PUBLIC_DEFAULT_ACTOR:-ui-operator@eupaygrid.local}
+    ports:
+      - '3000:3000'
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.121.0
+    command: ['--config=/etc/otelcol-contrib/config.yaml']
+    volumes:
+      - ./infra/otel/otel-collector.yml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - '4317:4317'
+      - '4318:4318'
+    profiles: ['observability']
+
+volumes:
+  pg-data:

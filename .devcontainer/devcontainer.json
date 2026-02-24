@@ -1,0 +1,28 @@
+{
+  "name": "EUPayGrid Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11"
+    }
+  },
+  "postCreateCommand": "cp -n .env.example .env || true",
+  "forwardPorts": [3000, 8000, 5432],
+  "portsAttributes": {
+    "3000": {
+      "label": "EUPayGrid Frontend",
+      "onAutoForward": "notify"
+    },
+    "8000": {
+      "label": "EUPayGrid Backend",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "Postgres"
+    }
+  }
+}

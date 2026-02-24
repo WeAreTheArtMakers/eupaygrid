@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  min-height: 100vh;
+  background: #f3f6fa;
+  color: #0d1b2a;
+  font-family: 'Avenir Next', 'Manrope', 'IBM Plex Sans', 'Segoe UI', sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+table {
+  border-collapse: collapse;
+}
