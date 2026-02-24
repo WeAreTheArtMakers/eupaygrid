@@ -13,8 +13,8 @@ EUPayGrid includes:
 
 ## Canlı Demo
 
-- Frontend (Vercel): `TO_BE_SET_AFTER_DEPLOY`
-- Backend API (Railway/Render): `TO_BE_SET_AFTER_DEPLOY`
+- Frontend (Vercel): [https://eupaygrid-demo.vercel.app](https://eupaygrid-demo.vercel.app)
+- Backend API (Railway): [https://eupaygrid-backend-production.up.railway.app](https://eupaygrid-backend-production.up.railway.app)
 
 ## Stack
 
