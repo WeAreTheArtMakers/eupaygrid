@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: eupaygrid-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://eupaygrid-demo.vercel.app
+      - key: POSTGRES_DSN
+        fromDatabase:
+          name: eupaygrid-postgres
+          property: connectionString
+      - key: ALLOWED_CURRENCIES
+        value: EUR
+      - key: SETTLEMENT_LAYER
+        value: simulated-solana
+
+  - type: pserv
+    name: eupaygrid-postgres
+    env: docker
+    plan: free
+    disk:
+      name: eupaygrid-pg-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1

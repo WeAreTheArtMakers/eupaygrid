@@ -11,6 +11,11 @@ EUPayGrid includes:
 - privacy-aware network activity views
 - realtime operational updates in UI via WebSocket
 
+## Canlı Demo
+
+- Frontend (Vercel): `TO_BE_SET_AFTER_DEPLOY`
+- Backend API (Railway/Render): `TO_BE_SET_AFTER_DEPLOY`
+
 ## Stack
 
 - Backend: FastAPI + asyncpg + Postgres
@@ -40,6 +45,7 @@ Portlar:
 - `infra/` local infra scaffolding
 - `docs/architecture.md` architecture and design notes
 - `docs/isp-tr.md` Kurumsal Mutabakat Protokolü (ISP) ürün metni (TR)
+- `polyphony-ledger` reference: [WeAreTheArtMakers/polyphony-ledger](https://github.com/WeAreTheArtMakers/polyphony-ledger)
 - `scripts/demo_seed.sh` helper for demo data
 - `scripts/start-demo.sh` one-command demo startup
 - `proto/` future event schema placeholder
@@ -57,6 +63,26 @@ Endpoints:
 - Backend: http://localhost:8000
 - Backend metrics: http://localhost:8000/metrics
 - Postgres: localhost:5432
+
+## Public Deployment (Railway + Vercel)
+
+1. Deploy backend to Railway from this repo root:
+   - Railway service build source: `backend/Dockerfile`
+   - Add Postgres plugin/service
+   - Set backend env vars:
+     - `POSTGRES_DSN` = Railway Postgres `DATABASE_URL`
+     - `CORS_ORIGINS` = your Vercel frontend URL
+     - `ALLOWED_CURRENCIES=EUR`
+     - `SETTLEMENT_LAYER=simulated-solana`
+2. Deploy frontend to Vercel from `frontend/` directory.
+3. Set frontend env vars on Vercel:
+   - `NEXT_PUBLIC_API_BASE=https://<your-backend-domain>`
+   - `NEXT_PUBLIC_WS_URL=wss://<your-backend-domain>/ws/events`
+   - `NEXT_PUBLIC_DEFAULT_ACTOR=ui-operator@eupaygrid.local`
+4. Update the **Canlı Demo** section at the top of this README with final URLs.
+
+Alternative backend target:
+- `render.yaml` is included for Render blueprint-style deployment.
 
 ## Local development (without Docker)
 
@@ -127,3 +153,14 @@ npm run dev
 
 - Settlement layer is simulated (`simulated-solana`) with generated mock tx ids.
 - OTel collector is scaffolded under compose profile `observability`.
+
+## Geliştirilecek Kısım (Simüle / Eksik Bırakılanlar)
+
+- Gerçek Solana on-chain yazım (şu an placeholder event)
+- Gerçek fiat partner entegrasyonu
+- Tam auth/RBAC katmanı (actor header ile demo)
+- Transfer ekranında isim/CVR serbest arama yerine seçmeli akış (institutions sayfasında arama mevcut)
+
+## Lisans
+
+Bu proje **WATAM (WeAreTheArtMakers) License** altındadır. Detay için `LICENSE` dosyasına bakın.
