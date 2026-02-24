@@ -6,12 +6,12 @@ EUPayGrid includes:
 
 - permissioned institution onboarding
 - reserve-backed internal balance activation (simulated)
-- institutional transfer settlement with double-entry ledger
+- institutional transfer settlement with a double-entry ledger
 - governance controls (approve/suspend/freeze/unfreeze) with audit log
 - privacy-aware network activity views
-- realtime operational updates in UI via WebSocket
+- realtime operational updates in the UI via WebSocket
 
-## Canlı Demo
+## Live Demo
 
 - Frontend (Vercel): [https://eupaygrid-demo.vercel.app](https://eupaygrid-demo.vercel.app)
 - Backend API (Railway): [https://eupaygrid-backend-production.up.railway.app](https://eupaygrid-backend-production.up.railway.app)
@@ -22,42 +22,42 @@ EUPayGrid includes:
 - Frontend: Next.js App Router + TypeScript + Tailwind + Recharts
 - Infra: Docker Compose
 
-## GitHub Üzerinden Çalıştırılabilir Demo
+## Run on GitHub (Codespaces)
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/WeAreTheArtMakers/eupaygrid)
 
-Repository sayfasından Codespaces ile doğrudan çalıştırabilirsiniz:
+You can run the demo directly from the repository page in Codespaces:
 
 ```bash
 ./scripts/start-demo.sh
 ```
 
-Portlar:
+Ports:
 
 - Frontend: `3000`
 - Backend: `8000`
 - Postgres: `5432`
 
-## Repository structure
+## Repository Structure
 
 - `backend/` FastAPI app
 - `frontend/` Next.js app
-- `infra/` local infra scaffolding
+- `infra/` local infrastructure scaffolding
 - `docs/architecture.md` architecture and design notes
-- `docs/isp-tr.md` Kurumsal Mutabakat Protokolü (ISP) ürün metni (TR)
+- `docs/isp-tr.md` ISP product narrative in Turkish
 - `polyphony-ledger` reference: [WeAreTheArtMakers/polyphony-ledger](https://github.com/WeAreTheArtMakers/polyphony-ledger)
 - `scripts/demo_seed.sh` helper for demo data
 - `scripts/start-demo.sh` one-command demo startup
 - `proto/` future event schema placeholder
 
-## Quick start (Docker)
+## Quick Start (Docker)
 
 ```bash
 cp .env.example .env
 docker compose up --build
 ```
 
-Endpoints:
+Local endpoints:
 
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8000
@@ -66,25 +66,19 @@ Endpoints:
 
 ## Public Deployment (Railway + Vercel)
 
-1. Deploy backend to Railway from this repo root:
-   - Railway service build source: `backend/Dockerfile`
-   - Add Postgres plugin/service
-   - Set backend env vars:
-     - `POSTGRES_DSN` = Railway Postgres `DATABASE_URL`
-     - `CORS_ORIGINS` = your Vercel frontend URL
-     - `ALLOWED_CURRENCIES=EUR`
-     - `SETTLEMENT_LAYER=simulated-solana`
-2. Deploy frontend to Vercel from `frontend/` directory.
-3. Set frontend env vars on Vercel:
-   - `NEXT_PUBLIC_API_BASE=https://<your-backend-domain>`
-   - `NEXT_PUBLIC_WS_URL=wss://<your-backend-domain>/ws/events`
-   - `NEXT_PUBLIC_DEFAULT_ACTOR=ui-operator@eupaygrid.local`
-4. Update the **Canlı Demo** section at the top of this README with final URLs.
+1. Deploy backend to Railway from the repository root.
+2. Configure Railway build source as `backend/Dockerfile`.
+3. Add a Postgres service/plugin in Railway.
+4. Set backend environment variables: `POSTGRES_DSN` (Railway Postgres `DATABASE_URL`), `CORS_ORIGINS` (your Vercel frontend URL), `ALLOWED_CURRENCIES=EUR`, `SETTLEMENT_LAYER=simulated-solana`.
+5. Deploy frontend to Vercel from the `frontend/` directory.
+6. Set frontend environment variables in Vercel: `NEXT_PUBLIC_API_BASE=https://<your-backend-domain>`, `NEXT_PUBLIC_WS_URL=wss://<your-backend-domain>/ws/events`, `NEXT_PUBLIC_DEFAULT_ACTOR=ui-operator@eupaygrid.local`.
+7. Update the **Live Demo** section at the top of this README with final URLs.
 
 Alternative backend target:
+
 - `render.yaml` is included for Render blueprint-style deployment.
 
-## Local development (without Docker)
+## Local Development (without Docker)
 
 ### Backend
 
@@ -105,7 +99,7 @@ npm install
 npm run dev
 ```
 
-## Core API endpoints
+## Core API Endpoints
 
 - `POST /institutions`
 - `GET /institutions`
@@ -125,42 +119,47 @@ npm run dev
 - `GET /health`
 - `WS /ws/events`
 
-## Suggested demo flow
+## Suggested Demo Flow
 
 1. Open `http://localhost:3000` and click **Demo Mode Seed**.
 2. Go to `/institutions` and inspect created institutions.
 3. Approve/suspend/freeze/unfreeze an institution and verify behavior.
-4. Go to `/transfers`:
-   - record a reserve deposit
-   - submit a transfer between approved institutions
-5. Verify:
-   - status updates and settlement tx id
-   - ledger entries on `/ledger`
-   - balance changes on `/balances`
-   - privacy view on `/network`
-   - governance actions on `/admin`
+4. Go to `/transfers`, record a reserve deposit, then submit a transfer between approved institutions.
+5. Verify status updates and settlement tx id.
+6. Verify ledger entries on `/ledger`.
+7. Verify balance changes on `/balances`.
+8. Verify privacy view behavior on `/network`.
+9. Verify governance actions and audit log on `/admin`.
 
-## Business rule checks
+## Business Rule Checks
 
-- Only approved institutions can send/receive.
+- Only approved institutions can send and receive.
 - Suspended institutions cannot transact.
 - Frozen wallets cannot initiate outgoing transfers.
 - Insufficient balance fails transfer.
-- Successful transfer writes transfer + settlement + 2 ledger entries + balance updates.
+- A successful transfer writes transfer + settlement + 2 ledger entries + balance updates.
 - Admin actions are audit logged.
 
 ## Notes
 
-- Settlement layer is simulated (`simulated-solana`) with generated mock tx ids.
-- OTel collector is scaffolded under compose profile `observability`.
+- The settlement layer is simulated (`simulated-solana`) with generated mock tx ids.
+- OTel collector scaffolding is available under the compose profile `observability`.
 
-## Geliştirilecek Kısım (Simüle / Eksik Bırakılanlar)
+## Known Simulations / Incomplete Areas
 
-- Gerçek Solana on-chain yazım (şu an placeholder event)
-- Gerçek fiat partner entegrasyonu
-- Tam auth/RBAC katmanı (actor header ile demo)
-- Transfer ekranında isim/CVR serbest arama yerine seçmeli akış (institutions sayfasında arama mevcut)
+- Real Solana on-chain write path (currently placeholder settlement event)
+- Real fiat reserve partner integration
+- Full authentication and RBAC layer (currently demo actor header)
+- Transfer screen recipient UX should evolve from free text to institution picker/search flow
 
-## Lisans
+## Next Development Phases
 
-Bu proje **WATAM (WeAreTheArtMakers) License** altındadır. Detay için `LICENSE` dosyasına bakın.
+1. Identity, authentication, and RBAC hardening: add SSO/OIDC login, enforce role-based policy checks server-side, and replace demo actor header with signed identity context.
+2. Real settlement integration: implement Solana transaction writing and confirmation tracking with retry, idempotency keys, and settlement reconciliation jobs.
+3. Fiat rail integration: ingest reserve deposits/withdrawals from a regulated banking partner API and add reserve reconciliation plus exception workflows.
+4. Transfer UX and operations tooling: replace free-text recipient entry with institution picker/search and expand admin tooling (filters, exports, case management).
+5. Reliability and compliance: expand test coverage (unit + integration + e2e + load) and add full tracing dashboards, alerting, and formal audit evidence exports.
+
+## License
+
+This project is licensed under the **WATAM (WeAreTheArtMakers) License**. See the `LICENSE` file for details.
